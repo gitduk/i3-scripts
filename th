@@ -1,0 +1,15 @@
+#!/bin/env bash
+
+if [ "$1" == "-c" ];then
+  words="${@:2}"
+  if hash trans &> /dev/null; then
+    trans :zh "$words" | fzf --prompt="$words"
+    $HOME/.bin/trans-notify  | xargs -I msg notify-send "$words" msg
+  fi
+else
+  words="${@}"
+  if command -v 'trans' &> /dev/null
+  then
+    $HOME/.bin/trans-notify :zh "$words" | xargs -I msg notify-send "$words" msg
+  fi
+fi

@@ -1,0 +1,21 @@
+#!/bin/env bash
+
+IFACEIP=$(ifconfig |grep -i $1 -A 1|grep -i running -A 1|grep inet| awk '{print $2}')
+
+if [ -n "$IFACEIP" ]; then
+    # echo "(G) VPN %{u#55aa55}$IFACEIP%{u-}"
+    echo "(G) VPN $IFACEIP"
+else
+    openvpn=$(pgrep -a openvpn$ |awk '{printf "%s:%s", $6, $7}')
+    if [ -n "$openvpn" ]; then
+        echo "(GO) VPN $openvpn"
+    else
+        http_port=$(ss -lntp |grep privoxy|awk '{printf $4}'|cut -d ':' -f2)
+        ss_local=$(ss -lntp |grep ss-local|awk '{printf $4}'|cut -d ':' -f2)
+        if [ -n "$http_port" ] && [ -n "$ss_local" ]; then
+            echo "(S) VPN 127.0.0.1:$http_port/$ss_local"
+        else
+            echo "VPN DISCONNECTED"
+        fi
+    fi
+fi

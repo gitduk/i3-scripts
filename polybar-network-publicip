@@ -1,0 +1,12 @@
+#!/bin/env bash
+
+
+cached_ip=$(cat /tmp/publicip 2> /dev/null)
+
+if [ "$?" != 0 ] || [ ! -n "cached_ip" ]; then
+    IP="$(curl -4 -sf ifconfig.co)"
+    echo $IP > /tmp/publicip
+else
+    IP=$cached_ip
+fi
+echo "# $IP%"

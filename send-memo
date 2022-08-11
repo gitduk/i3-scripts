@@ -1,0 +1,26 @@
+#!/bin/env bash
+
+if [ -n "$1" ];then
+    API=$(cat $HOME/.flomo.conf|grep 'API'|awk -F ':' '{print $2":"$3}')
+    tag=$(echo "$1" | grep '^#' |awk -F ' ' '{print $1}')
+
+    if [ ! -n "$tag" ];then
+        msg="$1"
+    else
+        content=$(echo "$1" | grep '^#' |cut -d ' ' -f2-)
+        if [ "$content" == "$tag" ];then
+            content="$(rofi -dmenu -p $tag:)"
+            if [ -n "$content" ]; then
+                msg="$tag\n$content"
+            else
+                msg=""
+            fi
+        else
+            msg="$tag\n$content"
+        fi
+    fi
+
+    if [ -n "$msg" ];then
+        curl -H "Content-Type: application/json" -X POST -d "{\"content\": \"$msg\"}" $API
+    fi
+fi
